@@ -10,6 +10,7 @@ def evaluate(comment):
         return True
     return False
 
-def get_reply():
-    return replies[(random.randrange(0,len(replies)))] + '\n\n\n*I am a bot, don\'t take me seriously...*'
 
+def get_reply():
+    return replies[(random.randrange(0, len(
+        replies)))] + '\n\n\n*I am a bot, don\'t take me seriously...* \n[source](https://github.com/scubar/correctionHunter)'

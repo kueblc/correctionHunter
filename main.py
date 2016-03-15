@@ -1,41 +1,45 @@
 #!/usr/bin/env python
 
+# 3rd-Party Libraries
 import praw
 import time
+
+# 1st-Party Libraries
 import service
-import traceback
+import helper
 
-UA = 'a script by /u/scubar that replies to grammar fanatics'
+# Initialize Logging
+logger = helper.log_factory()
 
-while True:
+# Login to Reddit
+reddit_session = helper.get_praw()
+
+# Main Loop
+running = True
+comments_evaluated = 0
+while running:
     try:
-        r = praw.Reddit(UA)
-        r.login()
-        break
-    except praw.errors.InvalidUser:
-        print('Wrong User!')
-    except praw.errors.InvalidUserPass:
-        print('Wrong Password!')
-
-print('Logged In.')
-
-while True:
-    try:
-        for comment in praw.helpers.comment_stream(r, 'all'):
+        for comment in praw.helpers.comment_stream(reddit_session, 'all'):
             if service.evaluate(comment.body):
-                print('Got a match!')
+                logger.info('Found a matching comment!')
                 while True:
                         try:
                             comment.reply(service.get_reply())
                             break
-                        except praw.errors.RateLimitExceeded as error:
-                            print('\tSleeping for {0} seconds'.format(error.sleep_time))
-                            time.sleep(error.sleep_time)
-                        except:
-                            traceback.print_exc()
+                        except reddit_session.errors.RateLimitExceeded as rateLimitEx:
+                            logger.error('\tRate Limited Exceeded! Sleeping for {0} seconds'.format(rateLimitEx.sleep_time))
+                            time.sleep(rateLimitEx.sleep_time)
+                        except Exception as ex:
+                            logger.error(ex)
                         finally:
                             break
+            comments_evaluated += 1
+    except KeyboardInterrupt:
+        logger.info('\tKeyboard Interrupt! Stopping after {0} Comments.'.format(comments_evaluated))
+        running = False
+    except SystemExit:
+        logger.info('\tSystem Exit! Stopping after {0} Comments.'.format(comments_evaluated))
+        running = False
     except:
-        traceback.print_exc()
-        print('\tSleeping for five minutes')
+        logger.error('\tUnhandled Exception! Sleeping for 5 minutes.')
         time.sleep(300)

@@ -2,7 +2,7 @@ import random
 
 keywords = ['*you\'re', '*your', '*you are']
 
-replies = ['a jerk.', 'annoying.', 'an asshole.', 'right.', 'a great person!', 'crazy!', 'funny!', 'really mean!'
+replies = ['annoying.', 'right.', 'a great person!', 'crazy!', 'funny!', 'really mean!'
            'not my mother!', 'a visionary', 'a tyrant', 'a little obsessed with grammar.']
 
 def evaluate(comment):
